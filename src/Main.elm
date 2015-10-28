@@ -1,15 +1,20 @@
 import Graphics.Element exposing (show, Element)
+import Mouse
 
 type alias Model = Int
 
-model: Int
-model =
+initialModel: Int
+initialModel =
   0
+
+update: () -> Model -> Model
+update _ model =
+  model + 1
 
 view: Model -> Element
 view model =
   show model
 
-main: Element
+main: Signal Element
 main =
-  view model
+  Signal.map view (Signal.foldp update initialModel Mouse.clicks)
