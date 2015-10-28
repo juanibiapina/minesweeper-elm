@@ -1,10 +1,10 @@
 import Graphics.Element exposing (show, Element)
 
-type alias Model = String
+type alias Model = Int
 
-model: Model
+model: Int
 model =
-  "hello world"
+  0
 
 view: Model -> Element
 view model =
