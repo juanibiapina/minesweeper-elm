@@ -1,20 +1,30 @@
-import Graphics.Element exposing (show, Element)
+import StartApp
 import Mouse
+import Html
+import Effects exposing (Effects)
 
 type alias Model = Int
 
-initialModel: Int
-initialModel =
-  0
+type Action =
+  Click
 
-update: () -> Model -> Model
-update _ model =
-  model + 1
+init: (Model, Effects Action)
+init =
+  (0 , Effects.none)
 
-view: Model -> Element
-view model =
-  show model
+update: Action -> Model -> (Model, Effects Action)
+update action model =
+  (model + 1
+  , Effects.none
+  )
 
-main: Signal Element
+view: Signal.Address Action -> Model -> Html.Html
+view address model =
+  Html.div [] [Html.text (toString model)]
+
+app =
+  StartApp.start { init = init , update = update, view = view, inputs = [Signal.map (\_ -> Click) Mouse.clicks] }
+
+main: Signal Html.Html
 main =
-  Signal.map view (Signal.foldp update initialModel Mouse.clicks)
+  app.html
