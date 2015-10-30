@@ -8,22 +8,24 @@ import Mouse
 
 type State = Opened | Closed
 
-type alias Model = State
+type alias Model =
+  { state: State
+  }
 
 type Action = Open
 
 init: (Model, Effects Action)
 init =
-  (Closed , Effects.none)
+  ({ state = Closed } , Effects.none)
 
 update: Action -> Model -> (Model, Effects Action)
 update action model =
   case action of
-    Open -> (Opened, Effects.none)
+    Open -> ({ model | state <- Opened }, Effects.none)
 
 view: Signal.Address Action -> Model -> Html.Html
 view address model =
-  case model of
+  case model.state of
     Opened -> Html.button [openedStyle] []
     Closed -> Html.button [onClick address Open, closedStyle] []
 
