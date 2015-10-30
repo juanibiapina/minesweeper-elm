@@ -16,14 +16,15 @@ type alias Model =
 
 type Action = Open
 
-init: (Model, Effects Action)
-init =
-  ({ state = Closed, content = Mine } , Effects.none)
+makeMine: Model
+makeMine =
+  { state = Closed
+  , content = Mine
+  }
 
-update: Action -> Model -> (Model, Effects Action)
-update action model =
-  case action of
-    Open -> ({ model | state <- Opened }, Effects.none)
+open: Model -> Model
+open model =
+  { model | state <- Opened }
 
 view: Signal.Address Action -> Model -> Html.Html
 view address model =
@@ -33,10 +34,6 @@ view address model =
         Mine -> Html.button [mineStyle] []
         Value v -> Html.button [openedStyle] [Html.text (toString v)]
     Closed -> Html.button [onClick address Open, closedStyle] []
-
-inputs: List (Signal Action)
-inputs =
-  []
 
 mineStyle: Html.Attribute
 mineStyle =
