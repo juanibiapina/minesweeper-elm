@@ -1,13 +1,13 @@
-import Counter
+import Tile
 import StartApp
 import Html
 
 app =
   StartApp.start
-    { init = Counter.init
-    , update = Counter.update
-    , view = Counter.view
-    , inputs = Counter.inputs
+    { init = Tile.init
+    , update = Tile.update
+    , view = Tile.view
+    , inputs = Tile.inputs
     }
 
 main: Signal Html.Html
