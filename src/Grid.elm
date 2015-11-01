@@ -69,9 +69,22 @@ init: (Grid, Effects Action)
 init =
   (emptyGrid |> fillMines |> calculateValues, Effects.none)
 
+floodOpen: Int -> Int -> Grid -> Grid
+floodOpen rowNumber columnNumber grid =
+  let tile = Maybe.andThen (Array.get rowNumber grid) (Array.get columnNumber)
+  in
+     case tile of
+       Just tile ->
+         if Tile.isZero tile
+         then
+           List.foldl (\(row, column) grid -> openTile row column grid) grid (neighborPositions rowNumber columnNumber)
+         else grid
+       Nothing -> grid
+
 openTile: Int -> Int -> Grid -> Grid
 openTile rowNumber columnNumber grid =
-  let openTileInColumn c tile =
+  let tile = Maybe.andThen (Array.get rowNumber grid) (Array.get columnNumber)
+      openTileInColumn c tile =
         if c == columnNumber
           then Tile.open tile
           else tile
@@ -79,8 +92,14 @@ openTile rowNumber columnNumber grid =
         if r == rowNumber
           then Array.indexedMap openTileInColumn row
           else row
+      gridWithOpenTile = Array.indexedMap openTileInRow grid
   in
-     Array.indexedMap openTileInRow grid
+     case tile of
+       Just tile ->
+         if Tile.isClosed tile
+         then floodOpen rowNumber columnNumber gridWithOpenTile
+         else grid
+       Nothing -> grid
 
 
 update: Action -> Grid -> (Grid, Effects Action)

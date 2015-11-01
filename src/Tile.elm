@@ -42,6 +42,18 @@ isMine tile =
     Mine -> True
     _ -> False
 
+isZero: Tile -> Bool
+isZero tile =
+  case tile.content of
+    Value 0 -> True
+    _ -> False
+
+isClosed: Tile -> Bool
+isClosed tile =
+  case tile.state of
+    Closed -> True
+    _ -> False
+
 open: Tile -> Tile
 open tile =
   { tile | state <- Opened }
