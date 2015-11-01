@@ -6,6 +6,7 @@ import Effects exposing (Effects)
 import Html
 import Html.Attributes exposing (style)
 import Random
+import Maybe exposing (andThen)
 
 type alias Grid = Array (Array Tile.Tile)
 
@@ -29,7 +30,7 @@ neighborPositions rowNumber columnNumber =
 
 neighborsOf: Int -> Int -> Grid -> List Tile.Tile
 neighborsOf rowNumber columnNumber grid =
-  List.filterMap (\(row, column) -> (Maybe.andThen (Array.get row grid) (Array.get column))) (neighborPositions rowNumber columnNumber)
+  List.filterMap (\(row, column) -> ((Array.get row grid) `andThen` (Array.get column))) (neighborPositions rowNumber columnNumber)
 
 emptyGrid: Grid
 emptyGrid =
@@ -81,7 +82,7 @@ init =
 
 floodOpen: Int -> Int -> Grid -> Grid
 floodOpen rowNumber columnNumber grid =
-  let tile = Maybe.andThen (Array.get rowNumber grid) (Array.get columnNumber)
+  let tile = (Array.get rowNumber grid) `andThen` (Array.get columnNumber)
   in
      case tile of
        Just tile ->
@@ -93,7 +94,7 @@ floodOpen rowNumber columnNumber grid =
 
 openTile: Int -> Int -> Grid -> Grid
 openTile rowNumber columnNumber grid =
-  let tile = Maybe.andThen (Array.get rowNumber grid) (Array.get columnNumber)
+  let tile = (Array.get rowNumber grid) `andThen` (Array.get columnNumber)
       openTileInColumn c tile =
         if c == columnNumber
           then Tile.open tile
