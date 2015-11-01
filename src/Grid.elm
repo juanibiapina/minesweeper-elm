@@ -9,6 +9,8 @@ type alias Model = Array Tile.Model
 
 type Action = Open Int Tile.Action
 
+gridWidth = 3
+
 neighborsOf: Int -> Model -> List Tile.Model
 neighborsOf index grid =
   let pos = [index - 1, index + 1]
@@ -17,7 +19,7 @@ neighborsOf index grid =
 
 emptyGrid: Model
 emptyGrid =
-  Array.fromList([Tile.empty, Tile.empty, Tile.empty])
+  Array.fromList(List.repeat gridWidth Tile.empty)
 
 fillMines: Model -> Model
 fillMines grid =
