@@ -70,13 +70,16 @@ init =
 
 openTile: Int -> Int -> Grid -> Grid
 openTile rowNumber columnNumber grid =
-  Array.indexedMap (\r row ->
-    if r == rowNumber
-       then Array.indexedMap (\c tile ->
-         if c == columnNumber
-            then Tile.open tile
-            else tile) row
-       else row ) grid
+  let openTileInColumn c tile =
+        if c == columnNumber
+          then Tile.open tile
+          else tile
+      openTileInRow r row =
+        if r == rowNumber
+          then Array.indexedMap openTileInColumn row
+          else row
+  in
+     Array.indexedMap openTileInRow grid
 
 
 update: Action -> Grid -> (Grid, Effects Action)
