@@ -6,14 +6,14 @@ import Effects exposing (Effects)
 import Html
 import Html.Attributes exposing (style)
 
-type alias Model = Array (Array Tile.Model)
+type alias Grid = Array (Array Tile.Tile)
 
 type Action = Open Int Int Tile.Action
 
 gridWidth = 10
 gridHeight = 10
 
-neighborsOf: Int -> Int -> Model -> List Tile.Model
+neighborsOf: Int -> Int -> Grid -> List Tile.Tile
 neighborsOf rowNumber columnNumber grid =
   let positions =
     [ (rowNumber - 1, columnNumber - 1)
@@ -28,11 +28,11 @@ neighborsOf rowNumber columnNumber grid =
   in
      List.filterMap (\(row, column) -> (Maybe.andThen (Array.get row grid) (Array.get column))) positions
 
-emptyGrid: Model
+emptyGrid: Grid
 emptyGrid =
   Array.repeat gridHeight (Array.repeat gridWidth Tile.empty)
 
-fillMines: Model -> Model
+fillMines: Grid -> Grid
 fillMines grid =
   let pos = [(0, 0), (4, 3), (4, 4)]
   in
@@ -49,7 +49,7 @@ fillMines grid =
             Nothing -> grid
      ) grid pos
 
-setValues: Model -> Model
+setValues: Grid -> Grid
 setValues grid =
   let calculateValue rowNumber columnNumber tile =
     if Tile.isMine tile
@@ -64,11 +64,11 @@ setValues grid =
        Array.indexedMap (\columnNumber tile ->
          calculateValue rowNumber columnNumber tile) row) grid
 
-init: (Model, Effects Action)
+init: (Grid, Effects Action)
 init =
   (emptyGrid |> fillMines |> setValues, Effects.none)
 
-openTile: Int -> Int -> Model -> Model
+openTile: Int -> Int -> Grid -> Grid
 openTile rowNumber columnNumber grid =
   Array.indexedMap (\r row ->
     if r == rowNumber
@@ -79,13 +79,13 @@ openTile rowNumber columnNumber grid =
        else row ) grid
 
 
-update: Action -> Model -> (Model, Effects Action)
+update: Action -> Grid -> (Grid, Effects Action)
 update action grid =
   case action of
     Open rowNumber columnNumber tileAction ->
       (openTile rowNumber columnNumber grid, Effects.none)
 
-view: Signal.Address Action -> Model -> Html.Html
+view: Signal.Address Action -> Grid -> Html.Html
 view address grid =
   let viewRow rowNumber row =
     Array.toList (Array.indexedMap (\columnNumber tile -> Tile.view (Signal.forwardTo address (Open rowNumber columnNumber)) tile) row)

@@ -9,7 +9,7 @@ import Mouse
 type State = Opened | Closed
 type Content = Mine | Value Int
 
-type alias Model =
+type alias Tile =
   { state: State
   , content: Content
   }
@@ -18,39 +18,39 @@ type Action = Open
 
 tileSize = "50px"
 
-empty: Model
+empty: Tile
 empty =
   { state = Closed
   , content = Value 0
   }
 
-value: Int -> Model
+value: Int -> Tile
 value v =
   { state = Closed
   , content = Value v
   }
 
-mine: Model
+mine: Tile
 mine =
   { state = Closed
   , content = Mine
   }
 
-isMine: Model -> Bool
+isMine: Tile -> Bool
 isMine tile =
   case tile.content of
     Mine -> True
     _ -> False
 
-open: Model -> Model
-open model =
-  { model | state <- Opened }
+open: Tile -> Tile
+open tile =
+  { tile | state <- Opened }
 
-view: Signal.Address Action -> Model -> Html.Html
-view address model =
-  case model.state of
+view: Signal.Address Action -> Tile -> Html.Html
+view address tile =
+  case tile.state of
     Opened ->
-      case model.content of
+      case tile.content of
         Mine -> Html.button [mineStyle] []
         Value v -> Html.button [openedStyle] [Html.text (toString v)]
     Closed -> Html.button [onClick address Open, closedStyle] []
