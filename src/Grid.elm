@@ -68,15 +68,26 @@ init: (Model, Effects Action)
 init =
   (emptyGrid |> fillMines |> setValues, Effects.none)
 
+openTile: Int -> Int -> Model -> Model
+openTile rowNumber columnNumber grid =
+  Array.indexedMap (\r row ->
+    if r == rowNumber
+       then Array.indexedMap (\c tile ->
+         if c == columnNumber
+            then Tile.open tile
+            else tile) row
+       else row ) grid
+
+
 update: Action -> Model -> (Model, Effects Action)
-update action model =
+update action grid =
   case action of
     Open rowNumber columnNumber tileAction ->
-      (Array.indexedMap (\r row -> if r == rowNumber then Array.indexedMap (\c tile -> if c == columnNumber then Tile.open tile else tile) row else row ) model, Effects.none)
+      (openTile rowNumber columnNumber grid, Effects.none)
 
 view: Signal.Address Action -> Model -> Html.Html
 view address grid =
   let viewRow rowNumber row =
     Array.toList (Array.indexedMap (\columnNumber tile -> Tile.view (Signal.forwardTo address (Open rowNumber columnNumber)) tile) row)
   in
-    Html.div [] (List.map (Html.div []) (Array.toList (Array.indexedMap viewRow grid)))
+     Html.div [] (List.map (Html.div []) (Array.toList (Array.indexedMap viewRow grid)))
