@@ -35,7 +35,7 @@ neighborLocations (rowNumber, columnNumber) =
 
 neighborsOf: Location -> Grid -> List Tile.Tile
 neighborsOf location grid =
-  List.filterMap (\location -> getTile location grid) (neighborLocations location)
+  List.filterMap (flip getTile grid) (neighborLocations location)
 
 emptyGrid: Grid
 emptyGrid =
@@ -93,7 +93,7 @@ floodOpen location grid =
        Just tile ->
          if Tile.isZero tile
          then
-           List.foldl (\(row, column) grid -> openTile (row, column) grid) grid (neighborLocations location)
+           List.foldl openTile grid (neighborLocations location)
          else grid
        Nothing -> grid
 
