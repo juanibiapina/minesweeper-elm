@@ -13,7 +13,7 @@ neighborsOf: Int -> Model -> List Tile.Model
 neighborsOf index grid =
   let pos = [index - 1, index + 1]
   in
-     List.filterMap identity (List.map (\index -> Array.get index grid) pos)
+     List.filterMap (\index -> Array.get index grid) pos
 
 emptyGrid: Model
 emptyGrid =
