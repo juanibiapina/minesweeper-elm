@@ -5,6 +5,7 @@ import Tile
 import Effects exposing (Effects)
 import Html
 import Html.Attributes exposing (style)
+import Random
 
 type alias Grid = Array (Array Tile.Tile)
 
@@ -12,7 +13,7 @@ type Action = Open Int Int Tile.Action
 
 numberOfColumns = 10
 numberOfRows = 10
-numberOfMines = 10
+numberOfMines = 20
 
 neighborPositions: Int -> Int -> List (Int, Int)
 neighborPositions rowNumber columnNumber =
@@ -34,22 +35,30 @@ emptyGrid: Grid
 emptyGrid =
   Array.repeat numberOfRows (Array.repeat numberOfColumns Tile.empty)
 
+generateMinePositions: Int -> List (Int, Int)
+generateMinePositions seed =
+  let (result, seed') = Random.generate (Random.list numberOfMines (Random.pair (Random.int 0 (numberOfRows - 1)) (Random.int 0 (numberOfColumns - 1)))) (Random.initialSeed seed)
+  in
+     result
+
+placeMines: List (Int, Int) -> Grid -> Grid
+placeMines positions grid =
+   List.foldl (\(rowNumber, columnNumber) grid ->
+     let row = Array.get rowNumber grid
+     in
+        case row of
+          Just row ->
+            let tile = Array.get columnNumber row
+            in
+               case tile of
+                 Just tile -> Array.set rowNumber (Array.set columnNumber Tile.mine row) grid
+                 Nothing -> grid
+          Nothing -> grid
+   ) grid positions
+
 fillMines: Grid -> Grid
 fillMines grid =
-  let minePositions = [(0, 0), (4, 3), (4, 4)]
-  in
-     List.foldl (\(rowNumber, columnNumber) grid ->
-       let row = Array.get rowNumber grid
-       in
-          case row of
-            Just row ->
-              let tile = Array.get columnNumber row
-              in
-                 case tile of
-                   Just tile -> Array.set rowNumber (Array.set columnNumber Tile.mine row) grid
-                   Nothing -> grid
-            Nothing -> grid
-     ) grid minePositions
+  placeMines (generateMinePositions 31416) grid
 
 calculateValues: Grid -> Grid
 calculateValues grid =
