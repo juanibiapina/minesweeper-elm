@@ -17,6 +17,10 @@ numberOfColumns = 10
 numberOfRows = 10
 numberOfMines = 20
 
+getTile: Location -> Grid -> Maybe Tile.Tile
+getTile (rowNumber, columnNumber) grid =
+  (Array.get rowNumber grid) `andThen` (Array.get columnNumber)
+
 neighborLocations: Location -> List Location
 neighborLocations (rowNumber, columnNumber) =
   [ (rowNumber - 1, columnNumber - 1)
@@ -31,7 +35,7 @@ neighborLocations (rowNumber, columnNumber) =
 
 neighborsOf: Location -> Grid -> List Tile.Tile
 neighborsOf location grid =
-  List.filterMap (\(row, column) -> ((Array.get row grid) `andThen` (Array.get column))) (neighborLocations location)
+  List.filterMap (\location -> getTile location grid) (neighborLocations location)
 
 emptyGrid: Grid
 emptyGrid =
@@ -82,20 +86,20 @@ init =
   (emptyGrid |> fillMines |> calculateValues, Effects.none)
 
 floodOpen: Location -> Grid -> Grid
-floodOpen (rowNumber, columnNumber) grid =
-  let tile = (Array.get rowNumber grid) `andThen` (Array.get columnNumber)
+floodOpen location grid =
+  let tile = getTile location grid
   in
      case tile of
        Just tile ->
          if Tile.isZero tile
          then
-           List.foldl (\(row, column) grid -> openTile (row, column) grid) grid (neighborLocations (rowNumber, columnNumber))
+           List.foldl (\(row, column) grid -> openTile (row, column) grid) grid (neighborLocations location)
          else grid
        Nothing -> grid
 
 openTile: Location -> Grid -> Grid
 openTile (rowNumber, columnNumber) grid =
-  let tile = (Array.get rowNumber grid) `andThen` (Array.get columnNumber)
+  let tile = getTile (rowNumber, columnNumber) grid
       openTileInColumn c tile =
         if c == columnNumber
           then Tile.open tile
