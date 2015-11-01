@@ -16,6 +16,8 @@ type alias Model =
 
 type Action = Open
 
+tileSize = "100px"
+
 empty: Model
 empty =
   { state = Closed
@@ -56,23 +58,23 @@ view address model =
 mineStyle: Html.Attribute
 mineStyle =
   style
-    [ ("width", "100px")
-    , ("height", "100px")
+    [ ("width", tileSize)
+    , ("height", tileSize)
     , ("background-color", "red")
     ]
 
 openedStyle: Html.Attribute
 openedStyle =
   style
-    [ ("width", "100px")
-    , ("height", "100px")
+    [ ("width", tileSize)
+    , ("height", tileSize)
     , ("background-color", "white")
     ]
 
 closedStyle: Html.Attribute
 closedStyle =
   style
-    [ ("width", "100px")
-    , ("height", "100px")
+    [ ("width", tileSize)
+    , ("height", tileSize)
     , ("background-color", "blue")
     ]
