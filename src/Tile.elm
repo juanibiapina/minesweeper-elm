@@ -16,7 +16,7 @@ type alias Model =
 
 type Action = Open
 
-tileSize = "100px"
+tileSize = "50px"
 
 empty: Model
 empty =
