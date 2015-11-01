@@ -49,8 +49,8 @@ fillMines grid =
             Nothing -> grid
      ) grid pos
 
-setValues: Grid -> Grid
-setValues grid =
+calculateValues: Grid -> Grid
+calculateValues grid =
   let calculateValue rowNumber columnNumber tile =
     if Tile.isMine tile
     then
@@ -66,7 +66,7 @@ setValues grid =
 
 init: (Grid, Effects Action)
 init =
-  (emptyGrid |> fillMines |> setValues, Effects.none)
+  (emptyGrid |> fillMines |> calculateValues, Effects.none)
 
 openTile: Int -> Int -> Grid -> Grid
 openTile rowNumber columnNumber grid =
