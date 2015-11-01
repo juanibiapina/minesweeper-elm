@@ -13,20 +13,21 @@ type Action = Open Int Int Tile.Action
 gridWidth = 10
 gridHeight = 10
 
+neighborPositions: Int -> Int -> List (Int, Int)
+neighborPositions rowNumber columnNumber =
+  [ (rowNumber - 1, columnNumber - 1)
+  , (rowNumber - 1, columnNumber)
+  , (rowNumber - 1, columnNumber + 1)
+  , (rowNumber, columnNumber - 1)
+  , (rowNumber, columnNumber + 1)
+  , (rowNumber + 1, columnNumber - 1)
+  , (rowNumber + 1, columnNumber)
+  , (rowNumber + 1, columnNumber + 1)
+  ]
+
 neighborsOf: Int -> Int -> Grid -> List Tile.Tile
 neighborsOf rowNumber columnNumber grid =
-  let positions =
-    [ (rowNumber - 1, columnNumber - 1)
-    , (rowNumber - 1, columnNumber)
-    , (rowNumber - 1, columnNumber + 1)
-    , (rowNumber, columnNumber - 1)
-    , (rowNumber, columnNumber + 1)
-    , (rowNumber + 1, columnNumber - 1)
-    , (rowNumber + 1, columnNumber)
-    , (rowNumber + 1, columnNumber + 1)
-    ]
-  in
-     List.filterMap (\(row, column) -> (Maybe.andThen (Array.get row grid) (Array.get column))) positions
+  List.filterMap (\(row, column) -> (Maybe.andThen (Array.get row grid) (Array.get column))) (neighborPositions rowNumber columnNumber)
 
 emptyGrid: Grid
 emptyGrid =
