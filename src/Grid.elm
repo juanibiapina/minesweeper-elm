@@ -9,7 +9,7 @@ type alias Model = Array Tile.Model
 
 type Action = Open Int Tile.Action
 
-gridWidth = 3
+gridWidth = 10
 
 neighborsOf: Int -> Model -> List Tile.Model
 neighborsOf index grid =
