@@ -8,16 +8,17 @@ import Html.Attributes exposing (style)
 import Random
 import Maybe exposing (andThen)
 
+type alias Location = (Int, Int)
 type alias Grid = Array (Array Tile.Tile)
 
-type Action = Open Int Int Tile.Action
+type Action = Open Location Tile.Action
 
 numberOfColumns = 10
 numberOfRows = 10
 numberOfMines = 20
 
-neighborLocations: Int -> Int -> List (Int, Int)
-neighborLocations rowNumber columnNumber =
+neighborLocations: Location -> List Location
+neighborLocations (rowNumber, columnNumber) =
   [ (rowNumber - 1, columnNumber - 1)
   , (rowNumber - 1, columnNumber)
   , (rowNumber - 1, columnNumber + 1)
@@ -28,21 +29,21 @@ neighborLocations rowNumber columnNumber =
   , (rowNumber + 1, columnNumber + 1)
   ]
 
-neighborsOf: Int -> Int -> Grid -> List Tile.Tile
-neighborsOf rowNumber columnNumber grid =
-  List.filterMap (\(row, column) -> ((Array.get row grid) `andThen` (Array.get column))) (neighborLocations rowNumber columnNumber)
+neighborsOf: Location -> Grid -> List Tile.Tile
+neighborsOf location grid =
+  List.filterMap (\(row, column) -> ((Array.get row grid) `andThen` (Array.get column))) (neighborLocations location)
 
 emptyGrid: Grid
 emptyGrid =
   Array.repeat numberOfRows (Array.repeat numberOfColumns Tile.empty)
 
-generateMinePositions: Int -> List (Int, Int)
+generateMinePositions: Int -> List Location
 generateMinePositions seed =
   let (result, seed') = Random.generate (Random.list numberOfMines (Random.pair (Random.int 0 (numberOfRows - 1)) (Random.int 0 (numberOfColumns - 1)))) (Random.initialSeed seed)
   in
      result
 
-placeMines: List (Int, Int) -> Grid -> Grid
+placeMines: List Location -> Grid -> Grid
 placeMines positions grid =
    List.foldl (\(rowNumber, columnNumber) grid ->
      let row = Array.get rowNumber grid
@@ -63,37 +64,37 @@ fillMines grid =
 
 calculateValues: Grid -> Grid
 calculateValues grid =
-  let calculateValue rowNumber columnNumber tile =
+  let calculateValue location tile =
     if Tile.isMine tile
     then
       tile
     else
-      let neighbors = neighborsOf rowNumber columnNumber grid
+      let neighbors = neighborsOf location grid
       in
          Tile.value (List.foldl (\tile sum -> if Tile.isMine tile then sum + 1 else sum) 0 neighbors)
   in
      Array.indexedMap (\rowNumber row ->
        Array.indexedMap (\columnNumber tile ->
-         calculateValue rowNumber columnNumber tile) row) grid
+         calculateValue (rowNumber, columnNumber) tile) row) grid
 
 init: (Grid, Effects Action)
 init =
   (emptyGrid |> fillMines |> calculateValues, Effects.none)
 
-floodOpen: Int -> Int -> Grid -> Grid
-floodOpen rowNumber columnNumber grid =
+floodOpen: Location -> Grid -> Grid
+floodOpen (rowNumber, columnNumber) grid =
   let tile = (Array.get rowNumber grid) `andThen` (Array.get columnNumber)
   in
      case tile of
        Just tile ->
          if Tile.isZero tile
          then
-           List.foldl (\(row, column) grid -> openTile row column grid) grid (neighborLocations rowNumber columnNumber)
+           List.foldl (\(row, column) grid -> openTile (row, column) grid) grid (neighborLocations (rowNumber, columnNumber))
          else grid
        Nothing -> grid
 
-openTile: Int -> Int -> Grid -> Grid
-openTile rowNumber columnNumber grid =
+openTile: Location -> Grid -> Grid
+openTile (rowNumber, columnNumber) grid =
   let tile = (Array.get rowNumber grid) `andThen` (Array.get columnNumber)
       openTileInColumn c tile =
         if c == columnNumber
@@ -108,7 +109,7 @@ openTile rowNumber columnNumber grid =
      case tile of
        Just tile ->
          if Tile.isClosed tile
-         then floodOpen rowNumber columnNumber gridWithOpenTile
+         then floodOpen (rowNumber, columnNumber) gridWithOpenTile
          else grid
        Nothing -> grid
 
@@ -116,12 +117,12 @@ openTile rowNumber columnNumber grid =
 update: Action -> Grid -> (Grid, Effects Action)
 update action grid =
   case action of
-    Open rowNumber columnNumber tileAction ->
-      (openTile rowNumber columnNumber grid, Effects.none)
+    Open location tileAction ->
+      (openTile location grid, Effects.none)
 
 view: Signal.Address Action -> Grid -> Html.Html
 view address grid =
   let viewRow rowNumber row =
-    Array.toList (Array.indexedMap (\columnNumber tile -> Tile.view (Signal.forwardTo address (Open rowNumber columnNumber)) tile) row)
+    Array.toList (Array.indexedMap (\columnNumber tile -> Tile.view (Signal.forwardTo address (Open (rowNumber, columnNumber))) tile) row)
   in
      Html.div [] (List.map (Html.div []) (Array.toList (Array.indexedMap viewRow grid)))
