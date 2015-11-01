@@ -4,6 +4,7 @@ import Array exposing (Array)
 import Tile
 import Effects exposing (Effects)
 import Html
+import Html.Attributes exposing (style)
 
 type alias Model = Array (Array Tile.Model)
 

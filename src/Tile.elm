@@ -61,6 +61,7 @@ mineStyle =
     [ ("width", tileSize)
     , ("height", tileSize)
     , ("background-color", "red")
+    , ("vertical-align", "top")
     ]
 
 openedStyle: Html.Attribute
@@ -69,6 +70,7 @@ openedStyle =
     [ ("width", tileSize)
     , ("height", tileSize)
     , ("background-color", "white")
+    , ("vertical-align", "top")
     ]
 
 closedStyle: Html.Attribute
@@ -77,4 +79,5 @@ closedStyle =
     [ ("width", tileSize)
     , ("height", tileSize)
     , ("background-color", "blue")
+    , ("vertical-align", "top")
     ]
