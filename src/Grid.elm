@@ -16,8 +16,8 @@ numberOfColumns = 10
 numberOfRows = 10
 numberOfMines = 20
 
-neighborPositions: Int -> Int -> List (Int, Int)
-neighborPositions rowNumber columnNumber =
+neighborLocations: Int -> Int -> List (Int, Int)
+neighborLocations rowNumber columnNumber =
   [ (rowNumber - 1, columnNumber - 1)
   , (rowNumber - 1, columnNumber)
   , (rowNumber - 1, columnNumber + 1)
@@ -30,7 +30,7 @@ neighborPositions rowNumber columnNumber =
 
 neighborsOf: Int -> Int -> Grid -> List Tile.Tile
 neighborsOf rowNumber columnNumber grid =
-  List.filterMap (\(row, column) -> ((Array.get row grid) `andThen` (Array.get column))) (neighborPositions rowNumber columnNumber)
+  List.filterMap (\(row, column) -> ((Array.get row grid) `andThen` (Array.get column))) (neighborLocations rowNumber columnNumber)
 
 emptyGrid: Grid
 emptyGrid =
@@ -88,7 +88,7 @@ floodOpen rowNumber columnNumber grid =
        Just tile ->
          if Tile.isZero tile
          then
-           List.foldl (\(row, column) grid -> openTile row column grid) grid (neighborPositions rowNumber columnNumber)
+           List.foldl (\(row, column) grid -> openTile row column grid) grid (neighborLocations rowNumber columnNumber)
          else grid
        Nothing -> grid
 
