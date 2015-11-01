@@ -10,8 +10,9 @@ type alias Grid = Array (Array Tile.Tile)
 
 type Action = Open Int Int Tile.Action
 
-gridWidth = 10
-gridHeight = 10
+numberOfColumns = 10
+numberOfRows = 10
+numberOfMines = 10
 
 neighborPositions: Int -> Int -> List (Int, Int)
 neighborPositions rowNumber columnNumber =
@@ -31,11 +32,11 @@ neighborsOf rowNumber columnNumber grid =
 
 emptyGrid: Grid
 emptyGrid =
-  Array.repeat gridHeight (Array.repeat gridWidth Tile.empty)
+  Array.repeat numberOfRows (Array.repeat numberOfColumns Tile.empty)
 
 fillMines: Grid -> Grid
 fillMines grid =
-  let pos = [(0, 0), (4, 3), (4, 4)]
+  let minePositions = [(0, 0), (4, 3), (4, 4)]
   in
      List.foldl (\(rowNumber, columnNumber) grid ->
        let row = Array.get rowNumber grid
@@ -48,7 +49,7 @@ fillMines grid =
                    Just tile -> Array.set rowNumber (Array.set columnNumber Tile.mine row) grid
                    Nothing -> grid
             Nothing -> grid
-     ) grid pos
+     ) grid minePositions
 
 calculateValues: Grid -> Grid
 calculateValues grid =
