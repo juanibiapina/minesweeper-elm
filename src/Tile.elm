@@ -16,11 +16,29 @@ type alias Model =
 
 type Action = Open
 
-makeMine: Model
-makeMine =
+empty: Model
+empty =
+  { state = Closed
+  , content = Value 0
+  }
+
+value: Int -> Model
+value v =
+  { state = Closed
+  , content = Value v
+  }
+
+mine: Model
+mine =
   { state = Closed
   , content = Mine
   }
+
+isMine: Model -> Bool
+isMine tile =
+  case tile.content of
+    Mine -> True
+    _ -> False
 
 open: Model -> Model
 open model =
